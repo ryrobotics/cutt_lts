@@ -269,6 +269,16 @@ void computePos0(const int vol,
   int cIn[32];
   int dOut[32];
   int cOut[32];
+
+  for (int i=0;i<32;i++)
+  {
+    dIn[i] = -1;
+    cIn[i] = -1;
+    dOut[i] = -1;
+    cOut[i] = -1;
+  }
+ 
+     
   //
   int c_in_prev = conv[0].ct_in;
   int cIn_prev = conv[0].ct_in;
@@ -482,6 +492,7 @@ void countPackedShTransactions0(const int warpSize, const int bankWidth, const i
   int d[32];
   int add[32];
   for (int i=0;i < 32;i++) p[i] = 0;
+  for (int i=0;i < 32;i++) d[i] = -1;
   //
   int c_prev = msh[0].ct;
   int add_prev = msh[0].ct;
