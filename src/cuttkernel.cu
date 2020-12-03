@@ -80,8 +80,8 @@ __global__ void transposeTiled(
     int posMajorOut = ((posMbar/Mbar.c_out) % Mbar.d_out)*Mbar.ct_out;
 #pragma unroll
     for (int i=16;i >= 1;i/=2) {
-      posMajorIn += __shfl_xor(posMajorIn, i);
-      posMajorOut += __shfl_xor(posMajorOut, i);
+      posMajorIn += __shfl_xor_sync(0xFFFFFFFF,posMajorIn, i);
+      posMajorOut += __shfl_xor_sync(0xFFFFFFFF,posMajorOut, i);
     }
     int posIn = posMajorIn + posMinorIn;
     int posOut = posMajorOut + posMinorOut;
@@ -165,9 +165,9 @@ __global__ void transposePacked(
 #pragma unroll
     for (int j=0;j < numRegStorage;j++) {
       int posMmk = threadIdx.x + j*blockDim.x;
-      posMmkIn[j]  += ((posMmk / __shfl(Mmk.c_in,i)) % __shfl(Mmk.d_in,i))*__shfl(Mmk.ct_in,i);
-      posMmkOut[j] += ((posMmk / __shfl(Mmk.c_out,i)) % __shfl(Mmk.d_out,i))*__shfl(Mmk.ct_out,i);
-      posSh[j]     += ((posMmk / __shfl(Msh.c,i)) % __shfl(Msh.d,i))*__shfl(Msh.ct,i);
+      posMmkIn[j]  += ((posMmk / __shfl_sync(0xFFFFFFFF,Mmk.c_in,i)) % __shfl_sync(0xFFFFFFFF,Mmk.d_in,i))*__shfl_sync(0xFFFFFFFF,Mmk.ct_in,i);
+      posMmkOut[j] += ((posMmk / __shfl_sync(0xFFFFFFFF,Mmk.c_out,i)) % __shfl_sync(0xFFFFFFFF,Mmk.d_out,i))*__shfl_sync(0xFFFFFFFF,Mmk.ct_out,i);
+      posSh[j]     += ((posMmk / __shfl_sync(0xFFFFFFFF,Msh.c,i)) % __shfl_sync(0xFFFFFFFF,Msh.d,i))*__shfl_sync(0xFFFFFFFF,Msh.ct,i);
     }
   }
 
@@ -187,13 +187,13 @@ __global__ void transposePacked(
     int posMbarOut = ((posMbar/Mbar.c_out) % Mbar.d_out)*Mbar.ct_out;
 #pragma unroll
     for (int i=16;i >= 1;i/=2) {
-      posMbarOut += __shfl_xor(posMbarOut, i);
+      posMbarOut += __shfl_xor_sync(0xFFFFFFFF,posMbarOut, i);
     }
 
     int posMbarIn = ((posMbar/Mbar.c_in) % Mbar.d_in)*Mbar.ct_in;
 #pragma unroll
     for (int i=16;i >= 1;i/=2) {
-      posMbarIn += __shfl_xor(posMbarIn, i);
+      posMbarIn += __shfl_xor_sync(0xFFFFFFFF,posMbarIn, i);
     }
 
     __syncthreads();
@@ -289,9 +289,9 @@ __global__ void transposePackedSplit(
 #pragma unroll
     for (int j=0;j < numRegStorage;j++) {
       int t = threadIdx.x + j*blockDim.x;
-      posMmkIn[j]  += ((t/__shfl(Mmk.c_in,i)) % __shfl(Mmk.d_in,i))*__shfl(Mmk.ct_in,i);
-      posMmkOut[j] += ((t/__shfl(Mmk.c_out,i)) % __shfl(Mmk.d_out,i))*__shfl(Mmk.ct_out,i);
-      posSh[j]     += ((t/__shfl(Msh.c,i)) % __shfl(Msh.d,i))*__shfl(Msh.ct,i);
+      posMmkIn[j]  += ((t/__shfl_sync(0xFFFFFFFF,Mmk.c_in,i)) % __shfl_sync(0xFFFFFFFF,Mmk.d_in,i))*__shfl_sync(0xFFFFFFFF,Mmk.ct_in,i);
+      posMmkOut[j] += ((t/__shfl_sync(0xFFFFFFFF,Mmk.c_out,i)) % __shfl_sync(0xFFFFFFFF,Mmk.d_out,i))*__shfl_sync(0xFFFFFFFF,Mmk.ct_out,i);
+      posSh[j]     += ((t/__shfl_sync(0xFFFFFFFF,Msh.c,i)) % __shfl_sync(0xFFFFFFFF,Msh.d,i))*__shfl_sync(0xFFFFFFFF,Msh.ct,i);
     }
   }
 
@@ -313,13 +313,13 @@ __global__ void transposePackedSplit(
     int posMbarOut = ((posMbar/Mbar.c_out) % Mbar.d_out)*Mbar.ct_out;
 #pragma unroll
     for (int i=16;i >= 1;i/=2) {
-      posMbarOut += __shfl_xor(posMbarOut, i);
+      posMbarOut += __shfl_xor_sync(0xFFFFFFFF,posMbarOut, i);
     }
 
     int posMbarIn = ((posMbar/Mbar.c_in) % Mbar.d_in)*Mbar.ct_in;
 #pragma unroll
     for (int i=16;i >= 1;i/=2) {
-      posMbarIn += __shfl_xor(posMbarIn, i);
+      posMbarIn += __shfl_xor_sync(0xFFFFFFFF,posMbarIn, i);
     }
 
     // Read from global memory
@@ -392,8 +392,8 @@ __global__ void transposeTiledCopy(
     int posMajorOut = ((posMbar/Mbar.c_out) % Mbar.d_out)*Mbar.ct_out;
 #pragma unroll
     for (int i=16;i >= 1;i/=2) {
-      posMajorIn += __shfl_xor(posMajorIn, i);
-      posMajorOut += __shfl_xor(posMajorOut, i);
+      posMajorIn += __shfl_xor_sync(0xFFFFFFFF,posMajorIn, i);
+      posMajorOut += __shfl_xor_sync(0xFFFFFFFF,posMajorOut, i);
     }
     int posIn = posMajorIn + posMinorIn;
     int posOut = posMajorOut + posMinorOut;
@@ -439,7 +439,7 @@ int tensorPos(
   int r = ((p/c) % d)*ct;
 #pragma unroll
   for (int i=numLane/2;i >= 1;i/=2) {
-    r += __shfl_xor(r, i);
+    r += __shfl_xor_sync(0xFFFFFFFF,r, i);
   }
   return r;
 
